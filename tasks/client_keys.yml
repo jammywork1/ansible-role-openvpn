@@ -57,33 +57,37 @@
     owner: root
     group: root
     mode: 0400
-    state: present
   with_items: "{{clients}}"
   when: 
     - item.static_ip is defined
 
 - name: unregister client static ip
-  template:
-    src: client.j2
-    dest: "{{openvpn_base_dir}}/client/{{item.name}}"
-    owner: root
-    group: root
-    mode: 0400
+  file:
+    path: "{{openvpn_base_dir}}/client/{{item.name}}"
     state: absent
   with_items: "{{clients}}"
   when: 
     - item.static_ip is undefined
 
+- name: test
+  debug:
+    msg: "{{ item }}"
+  with_together:
+    - "{{client_certs.results}}"
+    - "{{client_keys.results}}"
+    
+    
 - name: generate client config
   template:
     src: client.ovpn.j2
-    dest: "{{ openvpn_base_dir }}/{{item.0.item}}-{{inventory_hostname}}.ovpn"
+    dest: "{{ openvpn_base_dir }}/{{item.0.item.name}}-{{inventory_hostname}}.ovpn"
     owner: root
     group: root
     mode: 0400
   with_together:
     - "{{client_certs.results}}"
     - "{{client_keys.results}}"
+    
 
 - name: fetch client config
   fetch:
