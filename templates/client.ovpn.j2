@@ -33,6 +33,13 @@ register-dns
 {% endif %}
 
 key-direction 1
+
+{% if item.0.item.additional_conf is defined %}
+{% for option in item.0.item.additional_conf %}
+{{ option }}
+{% endfor %}
+{% endif %}
+
 <ca>
 {{ ca_cert.content|b64decode }}
 </ca>

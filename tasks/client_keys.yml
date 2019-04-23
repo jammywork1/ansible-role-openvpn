@@ -53,17 +53,17 @@
 - name: register client static ip
   template:
     src: client.j2
-    dest: "{{openvpn_base_dir}}/client/{{item.name}}"
+    dest: "{{openvpn_base_dir}}/client/OpenVPN-Client-{{ inventory_hostname[:24] }}-{{ item.name[:24] }}"
     owner: root
     group: root
-    mode: 0400
+    mode: 0744
   with_items: "{{clients}}"
   when: 
     - item.static_ip is defined
 
 - name: unregister client static ip
   file:
-    path: "{{openvpn_base_dir}}/client/{{item.name}}"
+    path: "{{openvpn_base_dir}}/client/OpenVPN-Client-{{ inventory_hostname[:24] }}-{{ item.name[:24] }}"
     state: absent
   with_items: "{{clients}}"
   when: 
