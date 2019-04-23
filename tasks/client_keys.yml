@@ -9,23 +9,23 @@
     mode: 0400
 
 - name: generate client key
-  command: "openssl req -nodes -newkey rsa:{{openvpn_rsa_bits}} -keyout {{item}}.key -out {{item}}.csr -days 3650 -subj /CN=OpenVPN-Client-{{ inventory_hostname[:24] }}-{{ item[:24] }}/"
+  command: "openssl req -nodes -newkey rsa:{{openvpn_rsa_bits}} -keyout {{item.name}}.key -out {{item.name}}.csr -days 3650 -subj /CN=OpenVPN-Client-{{ inventory_hostname[:24] }}-{{ item.name[:24] }}/"
   args:
     chdir: "{{ openvpn_key_dir }}"
-    creates: "{{item}}.key"
+    creates: "{{item.name}}.key"
   with_items: "{{clients}}"
 
 - name: protect client keys
   file:
-    path: "{{openvpn_key_dir}}/{{item}}.key"
+    path: "{{openvpn_key_dir}}/{{item.name}}.key"
     mode: 0400
   with_items: "{{clients}}"
 
 - name: sign client key
-  command: openssl x509 -req -in {{item}}.csr -out {{item}}.crt -CA ca.crt -CAkey ca-key.pem -sha256 -days 3650 -extfile openssl-client.ext
+  command: openssl x509 -req -in {{item.name}}.csr -out {{item.name}}.crt -CA ca.crt -CAkey ca-key.pem -sha256 -days 3650 -extfile openssl-client.ext
   args:
     chdir: "{{openvpn_key_dir}}"
-    creates: "{{item}}.crt"
+    creates: "{{item.name}}.crt"
   with_items: "{{clients}}"
 
 - name: register server ca key
@@ -40,15 +40,39 @@
 
 - name: register client certs
   slurp:
-    src: "{{openvpn_key_dir}}/{{item}}.crt"
+    src: "{{openvpn_key_dir}}/{{item.name}}.crt"
   with_items: "{{clients}}"
   register: client_certs
 
 - name: register client keys
   slurp:
-    src: "{{openvpn_key_dir}}/{{item}}.key"
+    src: "{{openvpn_key_dir}}/{{item.name}}.key"
   with_items: "{{clients}}"
   register: client_keys
+
+- name: register client static ip
+  template:
+    src: client.j2
+    dest: "{{openvpn_base_dir}}/client/{{item.name}}"
+    owner: root
+    group: root
+    mode: 0400
+    state: present
+  with_items: "{{clients}}"
+  when: 
+    - item.static_ip is defined
+
+- name: unregister client static ip
+  template:
+    src: client.j2
+    dest: "{{openvpn_base_dir}}/client/{{item.name}}"
+    owner: root
+    group: root
+    mode: 0400
+    state: absent
+  with_items: "{{clients}}"
+  when: 
+    - item.static_ip is undefined
 
 - name: generate client config
   template:
@@ -63,7 +87,7 @@
 
 - name: fetch client config
   fetch:
-    src: "{{ openvpn_base_dir }}/{{item}}-{{inventory_hostname}}.ovpn"
-    dest: "{{ openvpn_fetch_config_dir }}/{{item}}/{{inventory_hostname}}.ovpn"
+    src: "{{ openvpn_base_dir }}/{{item.name}}-{{inventory_hostname}}.ovpn"
+    dest: "{{ openvpn_fetch_config_dir }}/{{item.name}}/{{inventory_hostname}}.ovpn"
     flat: yes
   with_items: "{{clients}}"

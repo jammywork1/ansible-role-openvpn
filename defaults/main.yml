@@ -38,6 +38,8 @@ openvpn_client_to_client: false
 openvpn_masquerade_not_snat: false
 openvpn_addl_server_options: []
 openvpn_addl_client_options: []
+openvpn_dev: tun
+openvpn_version: 2.4.7*
 
 # Used in firewalld
 firewalld_default_interface_zone: public
