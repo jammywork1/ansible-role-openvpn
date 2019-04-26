@@ -59,7 +59,7 @@
     mode: 0744
   with_items: "{{clients}}"
   when: 
-    - item.static_ip is defined
+    - item.static is defined
 
 - name: unregister client static ip
   file:
@@ -67,7 +67,7 @@
     state: absent
   with_items: "{{clients}}"
   when: 
-    - item.static_ip is undefined
+    - item.static is undefined
 
 - name: test
   debug:
