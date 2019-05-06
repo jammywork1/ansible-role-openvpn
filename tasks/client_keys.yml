@@ -69,12 +69,12 @@
   when: 
     - item.static is undefined
 
-- name: test
-  debug:
-    msg: "{{ item }}"
-  with_together:
-    - "{{client_certs.results}}"
-    - "{{client_keys.results}}"
+# - name: test
+#   debug:
+#     msg: "{{ item }}"
+#   with_together:
+#     - "{{client_certs.results}}"
+#     - "{{client_keys.results}}"
     
     
 - name: generate client config
