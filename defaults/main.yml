@@ -40,6 +40,12 @@ openvpn_addl_server_options: []
 openvpn_addl_client_options: []
 openvpn_dev: tun
 openvpn_version: 2.4.7*
+openvpn_nobind: true
+openvpn_keepalive: '5 30'
+openvpn_persist_key: true
+openvpn_persist_tun: true
+openvpn_compress: lz4
+openvpn_verb: 3
 
 # Used in firewalld
 firewalld_default_interface_zone: public

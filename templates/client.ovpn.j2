@@ -13,12 +13,18 @@ remote {{openvpn_server_address}} {{openvpn_port}}
 dev {{ item.0.item.dev | default('tun', true) }}
 
 resolv-retry {{ openvpn_resolv_retry }}
+{% if openvpn_nobind|bool %}
 nobind
-keepalive 5 30
-compress lzo
+{% endif %}
+keepalive {{ openvpn_keepalive }}
+compress {{ openvpn_compress }}
+{% if openvpn_persist_key|bool %}
 persist-key
+{% endif %}
+{% if openvpn_persist_tun|bool %}
 persist-tun
-verb 3
+{% endif %}
+verb {{ openvpn_verb }}
 
 {% for option in openvpn_addl_client_options %}
 {{ option }}

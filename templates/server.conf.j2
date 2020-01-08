@@ -66,10 +66,15 @@ push "dhcp-option DNS 8.8.4.4"
 push "{{ opt }}"
 {% endfor %}
 {% endif %}
-keepalive 5 30
-compress lzo
+keepalive {{ openvpn_keepalive }}
+compress {{ openvpn_compress }}
+{% if openvpn_persist_key|bool %}
 persist-key
+{% endif %}
+{% if openvpn_persist_tun|bool %}
 persist-tun
+{% endif %}
+
 user nobody
 group nogroup
 
@@ -82,7 +87,7 @@ client-config-dir client
 status openvpn-status.log
 status-version {{ openvpn_status_version }}
 log-append /var/log/openvpn.log
-verb 3
+verb {{ openvpn_verb }}
 
 {% if openvpn_verify_cn|bool %}
 verify-x509-name OpenVPN-Client-{{inventory_hostname[:24]}} name-prefix
