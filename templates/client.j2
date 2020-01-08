@@ -1,6 +1,6 @@
 ifconfig-push {{ item.static.ip }} {{ item.static.mask }}
 
-{% if item.custom_options %}
+{% if item.custom_options is defined %}
     {% for option in item.custom_options %}
 {{ option }}
     {% endfor %}

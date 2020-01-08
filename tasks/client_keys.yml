@@ -50,6 +50,15 @@
   with_items: "{{clients}}"
   register: client_keys
 
+  
+- name: Create a directory 
+  file:
+    path: "{{openvpn_base_dir}}/client"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+    
 - name: register client static ip
   template:
     src: client.j2
